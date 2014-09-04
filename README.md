@@ -33,7 +33,7 @@ Grab a copy of the code and open up a shell prompt where you have put the files.
 Execute the following:
 ``` gradlew build```
  
-you will be able to get a copy of the .jar from XRayForModders\build\libs\[1.7.10]xrayformodders-deobf-0.1.jar
+you will be able to get a copy of the .jar from XRayForModders\build\libs\\[1.7.10]xrayformodders-deobf-0.1.jar
 
 Place this jar in the directory in your development environment and run it.
 
