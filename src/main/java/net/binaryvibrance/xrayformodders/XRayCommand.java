@@ -40,25 +40,49 @@ public class XRayCommand extends CommandBase {
 
 			Integer radius = null;
 			if (arguments.length >= 1) {
-				radius = Integer.getInteger(arguments[0]);
+				try {
+					radius = Integer.parseInt(arguments[0]);
+				} catch (Exception e) {
+
+				}
 			}
 
 			if (radius == null) {
 				radius = 3;
 			}
 
-			int blocksRemoved = doXRay(player.worldObj, player.chunkCoordX, player.chunkCoordZ, radius);
-			player.addChatComponentMessage(new ChatComponentText(String.format("Removed %d blocks", blocksRemoved)));
+			int minX = (player.chunkCoordX - ((radius - 1) / 2));
+			int maxX = (player.chunkCoordX + ((radius - 1) / 2));
+
+			int minZ = (player.chunkCoordZ - ((radius - 1) / 2));
+			int maxZ = (player.chunkCoordZ + ((radius - 1) / 2));
+
+
+
+			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
+			player.addChatComponentMessage(new ChatComponentText(String.format("clearing %d chunks", numberOfChunks)));
+			long blocksRemoved = 0;
+			float chunkProgress = 0;
+			for (int x = minX; x <= maxX; x++) {
+				for (int z = minZ; z <= maxZ; z++) {
+					blocksRemoved += doXRay(player.worldObj, x, z);
+					chunkProgress++;
+					player.addChatComponentMessage(new ChatComponentText(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+
+				}
+			}
+
+			player.addChatComponentMessage(new ChatComponentText(String.format("Removed %d blocks, sending to client", blocksRemoved)));
 		}
 	}
 
-	private int doXRay(World world, int chunkX, int chunkZ, int radius) {
-		int blocksRemoved = 0;
-		int minX = (chunkX - ((radius - 1) / 2)) * 16;
-		int maxX = (chunkX + ((radius - 1) / 2)) * 16;
+	private long doXRay(World world, int chunkX, int chunkZ) {
+		long blocksRemoved = 0;
+		int minX = chunkX * 16;
+		int maxX = chunkX * 16 + 16;
 
-		int minZ = (chunkZ - ((radius - 1) / 2)) * 16;
-		int maxZ = (chunkZ + ((radius - 1) / 2)) * 16;
+		int minZ = chunkZ * 16;
+		int maxZ = chunkZ * 16 + 16;
 
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
