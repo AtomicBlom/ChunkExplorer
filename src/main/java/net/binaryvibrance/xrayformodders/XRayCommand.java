@@ -26,7 +26,7 @@ public class XRayCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvxray [radiusInChunks]";
+		return "bvxray [radiusInChunks] [filter]";
 	}
 
 	@Override
@@ -46,6 +46,10 @@ public class XRayCommand extends CommandBase {
 
 				}
 			}
+			String filter = null;
+			if (arguments.length >= 2) {
+				filter = arguments[1];
+			}
 
 			if (radius == null) {
 				radius = 3;
@@ -57,15 +61,13 @@ public class XRayCommand extends CommandBase {
 			int minZ = (player.chunkCoordZ - ((radius - 1) / 2));
 			int maxZ = (player.chunkCoordZ + ((radius - 1) / 2));
 
-
-
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
 			player.addChatComponentMessage(new ChatComponentText(String.format("clearing %d chunks", numberOfChunks)));
 			long blocksRemoved = 0;
 			float chunkProgress = 0;
 			for (int x = minX; x <= maxX; x++) {
 				for (int z = minZ; z <= maxZ; z++) {
-					blocksRemoved += doXRay(player.worldObj, x, z);
+					blocksRemoved += doXRay(player.worldObj, x, z, filter);
 					chunkProgress++;
 					player.addChatComponentMessage(new ChatComponentText(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 
@@ -76,7 +78,7 @@ public class XRayCommand extends CommandBase {
 		}
 	}
 
-	private long doXRay(World world, int chunkX, int chunkZ) {
+	private long doXRay(World world, int chunkX, int chunkZ, String filter) {
 		long blocksRemoved = 0;
 		int minX = chunkX * 16;
 		int maxX = chunkX * 16 + 16;
@@ -89,6 +91,18 @@ public class XRayCommand extends CommandBase {
 				for (int y = 1; y < world.getHeight(); ++y) {
 					Block b = world.getBlock(x, y, z);
 
+					String unlocalizedName = b.getUnlocalizedName();
+					if (!unlocalizedName.contains(":")) {
+						unlocalizedName = "minecraft:" + unlocalizedName;
+					}
+
+					if (filter != null && unlocalizedName.contains(filter)) {
+						world.setBlock(x, y, z, Blocks.air, 0, 0);
+						world.markBlockForUpdate(x, y, z);
+						blocksRemoved++;
+						continue;
+					}
+
 					if (b == Blocks.stone || b == Blocks.sand || b == Blocks.grass || b == Blocks.gravel || b == Blocks.dirt) {
 						boolean liquidFound = false;
 						for (int[] neighbour : neighbours) {
@@ -99,7 +113,7 @@ public class XRayCommand extends CommandBase {
 							}
 						}
 
-						if (!liquidFound) {
+						if (!liquidFound && (filter == null)) {
 							world.setBlock(x, y, z, Blocks.air, 0, 0);
 							world.markBlockForUpdate(x, y, z);
 							blocksRemoved++;

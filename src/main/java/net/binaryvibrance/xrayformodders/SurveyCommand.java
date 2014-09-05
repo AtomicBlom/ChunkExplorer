@@ -82,7 +82,9 @@ public class SurveyCommand extends CommandBase {
 			SortedSet<Map.Entry<String, List<Block>>> sortedSet = new TreeSet<Map.Entry<String, List<Block>>>(new Comparator<Map.Entry<String, List<Block>>>() {
 				@Override
 				public int compare(Map.Entry<String, List<Block>> blockListA, Map.Entry<String, List<Block>> blockListB) {
-					return blockListB.getValue().size() - blockListA.getValue().size();
+					int numCompare = blockListB.getValue().size() - blockListA.getValue().size();
+					if (numCompare != 0) return numCompare;
+					return blockListB.getKey().compareToIgnoreCase(blockListA.getKey());
 				}
 			});
 			sortedSet.addAll(locatedBlocks.entrySet());
@@ -98,6 +100,10 @@ public class SurveyCommand extends CommandBase {
 
 			for (Map.Entry<String, List<Block>> kvp : sortedSet) {
 				String name = kvp.getKey().substring(5);
+				if (!name.contains(":")) {
+					name = "minecraft:" + name;
+				}
+								
 				if (filter != null && !name.contains(filter)) {
 					continue;
 				}
@@ -127,17 +133,9 @@ public class SurveyCommand extends CommandBase {
 	private long doSurvey(World world, int chunkX, int chunkZ, Dictionary<String, List<Block>> locatedBlocks) {
 		long blocksSurveyed = 0;
 		int minX = chunkX * 16;
-		int maxX = chunkX * 16 + 15;
-		if (chunkX < 0) {
-			minX++;
-			maxX++;
-		}
+		int maxX = chunkX * 16 + 16;
 		int minZ = chunkZ * 16;
-		int maxZ = chunkZ * 16 + 15;
-		if (chunkZ < 0) {
-			minZ++;
-			maxZ++;
-		}
+		int maxZ = chunkZ * 16 + 16;
 
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
