@@ -15,6 +15,7 @@ public class XRay {
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new XRayCommand());
+		event.registerServerCommand(new SurveyCommand());
 	}
 }
 
