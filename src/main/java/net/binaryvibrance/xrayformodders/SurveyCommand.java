@@ -127,10 +127,17 @@ public class SurveyCommand extends CommandBase {
 	private long doSurvey(World world, int chunkX, int chunkZ, Dictionary<String, List<Block>> locatedBlocks) {
 		long blocksSurveyed = 0;
 		int minX = chunkX * 16;
-		int maxX = chunkX * 16 + 16;
-
+		int maxX = chunkX * 16 + 15;
+		if (chunkX < 0) {
+			minX++;
+			maxX++;
+		}
 		int minZ = chunkZ * 16;
-		int maxZ = chunkZ * 16 + 16;
+		int maxZ = chunkZ * 16 + 15;
+		if (chunkZ < 0) {
+			minZ++;
+			maxZ++;
+		}
 
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
