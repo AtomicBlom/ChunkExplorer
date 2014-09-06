@@ -103,7 +103,7 @@ public class SurveyCommand extends CommandBase {
 				if (!name.contains(":")) {
 					name = "minecraft:" + name;
 				}
-								
+
 				if (filter != null && !name.contains(filter)) {
 					continue;
 				}
@@ -112,7 +112,7 @@ public class SurveyCommand extends CommandBase {
 				ChatComponentText chat = new ChatComponentText("");
 				ChatComponentText subChatComponent;
 				chat.setChatStyle(white);
-				subChatComponent = new ChatComponentText(kvp.getKey().substring(5));
+				subChatComponent = new ChatComponentText(name);
 				subChatComponent.setChatStyle(blockName);
 				chat.appendSibling(subChatComponent);
 				chat.appendText(" - ");
