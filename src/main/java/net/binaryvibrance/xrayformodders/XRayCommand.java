@@ -1,6 +1,8 @@
 package net.binaryvibrance.xrayformodders;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -107,7 +109,7 @@ public class XRayCommand extends CommandBase {
 						boolean liquidFound = false;
 						for (int[] neighbour : neighbours) {
 							Block neighbourBlock = world.getBlock(x + neighbour[0], y + neighbour[1], z + neighbour[2]);
-							if (neighbourBlock == Blocks.water || neighbourBlock == Blocks.lava) {
+							if (neighbourBlock instanceof BlockStaticLiquid || neighbourBlock instanceof BlockDynamicLiquid) {
 								liquidFound = true;
 								break;
 							}
@@ -127,12 +129,12 @@ public class XRayCommand extends CommandBase {
 	}
 
 	static final int[][] neighbours = {
-			{0, 0, 1},
 			{1, 0, 0},
-			{0, 0, -1},
-			{-1, 0, 0},
 			{0, 1, 0},
-			{0, -1, 0}
+			{0, 0, 1},
+			{-1, 0, 0},
+			{0, -1, 0},
+			{0, 0, -1},
 	};
 }
 
