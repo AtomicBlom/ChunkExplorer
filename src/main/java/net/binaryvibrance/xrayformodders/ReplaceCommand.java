@@ -19,7 +19,7 @@ public class ReplaceCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvreplace [diameterInChunks] blockToReplace blockToReplaceWith";
+		return "bvreplace [radiusInChunks] blockToReplace blockToReplaceWith";
 	}
 
 	@Override

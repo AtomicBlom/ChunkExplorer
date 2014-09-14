@@ -24,7 +24,7 @@ public class SurveyCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvsurvey [diameterInChunks] [filter]";
+		return "bvsurvey [radiusInChunks] [filter]";
 	}
 
 	@Override
