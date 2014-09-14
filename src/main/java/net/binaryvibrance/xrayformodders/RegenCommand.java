@@ -30,7 +30,7 @@ public class RegenCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvregen [radiusInChunks]";
+		return "bvregen [diameterInChunks]";
 	}
 
 	@Override
@@ -42,16 +42,18 @@ public class RegenCommand extends CommandBase {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 
+			int argumentNumber = 0;
+
 			Integer radius = null;
-			if (arguments.length >= 1) {
+			if (arguments.length > argumentNumber) {
 				try {
-					radius = Integer.parseInt(arguments[0]);
+					radius = Integer.parseInt(arguments[argumentNumber]);
 				} catch (Exception e) {
 				}
 			}
 
 			if (radius == null) {
-				radius = 3;
+				radius = 1;
 			}
 
 			int minX = (player.chunkCoordX - ((radius - 1) / 2));
@@ -62,8 +64,6 @@ public class RegenCommand extends CommandBase {
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
 			player.addChatComponentMessage(new ChatComponentText(String.format("regenerating %d chunks", numberOfChunks)));
-			Hashtable<String, List<Block>> locatedBlocks = new Hashtable<String, List<Block>>();
-			long blocksSurveyed = 0;
 			float chunkProgress = 0;
 
 			World world = player.worldObj;

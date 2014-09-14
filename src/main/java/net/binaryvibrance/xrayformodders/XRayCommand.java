@@ -40,21 +40,23 @@ public class XRayCommand extends CommandBase {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 
+			int argumentNumber = 0;
 			Integer radius = null;
-			if (arguments.length >= 1) {
+			if (arguments.length > argumentNumber) {
 				try {
-					radius = Integer.parseInt(arguments[0]);
+					radius = Integer.parseInt(arguments[argumentNumber]);
+					argumentNumber++;
 				} catch (Exception e) {
 
 				}
 			}
 			String filter = null;
-			if (arguments.length >= 2) {
-				filter = arguments[1];
+			if (arguments.length > argumentNumber) {
+				filter = arguments[argumentNumber];
 			}
 
 			if (radius == null) {
-				radius = 3;
+				radius = 1;
 			}
 
 			int minX = (player.chunkCoordX - ((radius - 1) / 2));
