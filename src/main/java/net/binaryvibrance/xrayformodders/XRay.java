@@ -17,6 +17,7 @@ public class XRay {
 		event.registerServerCommand(new XRayCommand());
 		event.registerServerCommand(new SurveyCommand());
 		event.registerServerCommand(new RegenCommand());
+		event.registerServerCommand(new ReplaceCommand());
 	}
 }
 
