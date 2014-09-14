@@ -28,7 +28,7 @@ public class XRayCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvxray [radiusInChunks] [filter]";
+		return "bvxray [diameterInChunks] [filter]";
 	}
 
 	@Override
@@ -41,10 +41,10 @@ public class XRayCommand extends CommandBase {
 			}
 
 			int argumentNumber = 0;
-			Integer radius = null;
+			Integer diameter = null;
 			if (arguments.length > argumentNumber) {
 				try {
-					radius = Integer.parseInt(arguments[argumentNumber]);
+					diameter = Integer.parseInt(arguments[argumentNumber]);
 					argumentNumber++;
 				} catch (Exception e) {
 
@@ -55,15 +55,15 @@ public class XRayCommand extends CommandBase {
 				filter = arguments[argumentNumber];
 			}
 
-			if (radius == null) {
-				radius = 1;
+			if (diameter == null) {
+				diameter = 1;
 			}
 
-			int minX = (player.chunkCoordX - ((radius - 1) / 2));
-			int maxX = (player.chunkCoordX + ((radius - 1) / 2));
+			int minX = (player.chunkCoordX - ((diameter - 1) / 2));
+			int maxX = (player.chunkCoordX + ((diameter - 1) / 2));
 
-			int minZ = (player.chunkCoordZ - ((radius - 1) / 2));
-			int maxZ = (player.chunkCoordZ + ((radius - 1) / 2));
+			int minZ = (player.chunkCoordZ - ((diameter - 1) / 2));
+			int maxZ = (player.chunkCoordZ + ((diameter - 1) / 2));
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
 			player.addChatComponentMessage(new ChatComponentText(String.format("clearing %d chunks", numberOfChunks)));

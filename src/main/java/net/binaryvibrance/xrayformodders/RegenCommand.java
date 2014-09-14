@@ -44,23 +44,23 @@ public class RegenCommand extends CommandBase {
 
 			int argumentNumber = 0;
 
-			Integer radius = null;
+			Integer diameter = null;
 			if (arguments.length > argumentNumber) {
 				try {
-					radius = Integer.parseInt(arguments[argumentNumber]);
+					diameter = Integer.parseInt(arguments[argumentNumber]);
 				} catch (Exception e) {
 				}
 			}
 
-			if (radius == null) {
-				radius = 1;
+			if (diameter == null) {
+				diameter = 1;
 			}
 
-			int minX = (player.chunkCoordX - ((radius - 1) / 2));
-			int maxX = (player.chunkCoordX + ((radius - 1) / 2));
+			int minX = (player.chunkCoordX - ((diameter - 1) / 2));
+			int maxX = (player.chunkCoordX + ((diameter - 1) / 2));
 
-			int minZ = (player.chunkCoordZ - ((radius - 1) / 2));
-			int maxZ = (player.chunkCoordZ + ((radius - 1) / 2));
+			int minZ = (player.chunkCoordZ - ((diameter - 1) / 2));
+			int maxZ = (player.chunkCoordZ + ((diameter - 1) / 2));
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
 			player.addChatComponentMessage(new ChatComponentText(String.format("regenerating %d chunks", numberOfChunks)));

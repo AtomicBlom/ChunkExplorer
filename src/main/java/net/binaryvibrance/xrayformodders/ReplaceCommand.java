@@ -19,7 +19,7 @@ public class ReplaceCommand extends CommandBase {
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvreplace [radiusInChunks] blockToReplace blockToReplaceWith";
+		return "bvreplace [diameterInChunks] blockToReplace blockToReplaceWith";
 	}
 
 	@Override
@@ -31,10 +31,10 @@ public class ReplaceCommand extends CommandBase {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 			int argumentNumber = 0;
-			Integer radius = null;
+			Integer diameter = null;
 			if (arguments.length > argumentNumber) {
 				try {
-					radius = Integer.parseInt(arguments[argumentNumber]);
+					diameter = Integer.parseInt(arguments[argumentNumber]);
 					argumentNumber++;
 				} catch (Exception e) {
 				}
@@ -51,8 +51,8 @@ public class ReplaceCommand extends CommandBase {
 				replaceBlock = arguments[argumentNumber];
 			}
 
-			if (radius == null) {
-				radius = 1;
+			if (diameter == null) {
+				diameter = 1;
 			}
 
 			Block replacementBlock;
@@ -86,11 +86,11 @@ public class ReplaceCommand extends CommandBase {
 
 			}
 
-			int minX = (player.chunkCoordX - ((radius - 1) / 2));
-			int maxX = (player.chunkCoordX + ((radius - 1) / 2));
+			int minX = (player.chunkCoordX - ((diameter - 1) / 2));
+			int maxX = (player.chunkCoordX + ((diameter - 1) / 2));
 
-			int minZ = (player.chunkCoordZ - ((radius - 1) / 2));
-			int maxZ = (player.chunkCoordZ + ((radius - 1) / 2));
+			int minZ = (player.chunkCoordZ - ((diameter - 1) / 2));
+			int maxZ = (player.chunkCoordZ + ((diameter - 1) / 2));
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
 			player.addChatComponentMessage(new ChatComponentText(String.format("conducting survey over %d chunks", numberOfChunks)));
