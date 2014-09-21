@@ -59,7 +59,7 @@ Allows you to replace one type of block with another.
 
 Distribution
 ------------
-This code is complete in that it compiles and does what it advertises on the tin, but I have not yet investigated distribution channels so I have not compiled a binary for downloading.
+The latest release is available right here on the GitHub repository: https://github.com/AtomicBlom/ChunkExplorer/releases/
 
 Running the mod from source
 ---------------------------
