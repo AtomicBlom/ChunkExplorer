@@ -1,36 +1,28 @@
-package net.binaryvibrance.xrayformodders;
+package net.binaryvibrance.chunkexplorer;
 
-import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.*;
 
 public class RegenCommand extends CommandBase {
 	@Override
 	public String getCommandName() {
-		return "bvregen";
+		return "chunkregen";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvregen [radiusInChunks]";
+		return "chunkregen [radiusInChunks]";
 	}
 
 	@Override

@@ -1,16 +1,16 @@
-package net.binaryvibrance.xrayformodders;
+package net.binaryvibrance.chunkexplorer;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = XRay.MOD_ID, name = XRay.MOD_NAME, version = XRay.MOD_VERSION)
-public class XRay {
-	public static final String MOD_ID = "xrayformodders";
-	public static final String MOD_NAME = "XRay for Modders";
+@Mod(modid = ChunkExplorer.MOD_ID, name = ChunkExplorer.MOD_NAME, version = ChunkExplorer.MOD_VERSION)
+public class ChunkExplorer {
+	public static final String MOD_ID = "chunkexplorer";
+	public static final String MOD_NAME = "Chunk Explorer";
 	public static final String MOD_VERSION = "@MOD_VERSION@";
 
-	@Mod.Instance(XRay.MOD_ID)
-	public static XRay instance;
+	@Mod.Instance(ChunkExplorer.MOD_ID)
+	public static ChunkExplorer instance;
 
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {

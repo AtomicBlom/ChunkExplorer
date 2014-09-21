@@ -1,34 +1,25 @@
-package net.binaryvibrance.xrayformodders;
+package net.binaryvibrance.chunkexplorer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
 
 public class XRayCommand extends CommandBase {
 	@Override
 	public String getCommandName() {
-		return "bvxray";
+		return "chunkxray";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvxray [radiusInChunks] [filter]";
+		return "chunkxray [radiusInChunks] [filter]";
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package net.binaryvibrance.xrayformodders;
+package net.binaryvibrance.chunkexplorer;
 
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
@@ -14,12 +14,12 @@ import java.util.List;
 public class ReplaceCommand extends CommandBase {
 	@Override
 	public String getCommandName() {
-		return "bvreplace";
+		return "chunkreplace";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvreplace [radiusInChunks] blockToReplace blockToReplaceWith";
+		return "chunkreplace [radiusInChunks] blockToReplace blockToReplaceWith";
 	}
 
 	@Override

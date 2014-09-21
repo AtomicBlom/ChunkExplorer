@@ -1,17 +1,14 @@
-package net.binaryvibrance.xrayformodders;
+package net.binaryvibrance.chunkexplorer;
 
-import joptsimple.util.KeyValuePair;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -19,12 +16,12 @@ import java.util.*;
 public class SurveyCommand extends CommandBase {
 	@Override
 	public String getCommandName() {
-		return "bvsurvey";
+		return "chunksurvey";
 	}
 
 	@Override
 	public String getCommandUsage(ICommandSender commandSender) {
-		return "bvsurvey [radiusInChunks] [filter]";
+		return "chunksurvey [radiusInChunks] [filter]";
 	}
 
 	@Override
