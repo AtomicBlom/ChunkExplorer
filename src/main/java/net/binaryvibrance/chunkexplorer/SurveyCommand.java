@@ -1,11 +1,14 @@
 package net.binaryvibrance.chunkexplorer;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
@@ -29,7 +32,7 @@ public class SurveyCommand extends CommandBase {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
 
-			if (!MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile())) {
+			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 
@@ -139,7 +142,8 @@ public class SurveyCommand extends CommandBase {
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					Block b = world.getBlock(x, y, z);
+					IBlockState blockState = world.getBlockState(new BlockPos(x, y, z));
+					final Block b = blockState.getBlock();
 					if (b == Blocks.air) continue;
 					String blockName = b.getUnlocalizedName();
 					List<Block> blocks = locatedBlocks.get(blockName);

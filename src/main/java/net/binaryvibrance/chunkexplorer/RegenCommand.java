@@ -4,6 +4,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.MinecraftException;
@@ -30,7 +31,7 @@ public class RegenCommand extends CommandBase {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
 
-			if (!MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile())) {
+			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 
@@ -66,11 +67,11 @@ public class RegenCommand extends CommandBase {
 			for (int chunkZ = minZ; chunkZ <= maxZ; chunkZ++) {
 				for (int chunkX = minX; chunkX <= maxX; chunkX++) {
 					long k = ChunkCoordIntPair.chunkXZ2Int(chunkX, chunkZ);
-					IChunkLoader currentChunkLoader = provider.currentChunkLoader;
-					provider.currentChunkLoader = null;
-					provider.loadedChunkHashMap.remove(k);
+					IChunkLoader currentChunkLoader = provider.chunkLoader;
+					provider.chunkLoader = null;
+					provider.id2ChunkMap.remove(k);
 					Chunk chunk = provider.originalLoadChunk(chunkX, chunkZ);
-					provider.currentChunkLoader = currentChunkLoader;
+					provider.chunkLoader = currentChunkLoader;
 					try {
 						currentChunkLoader.saveChunk(world, chunk);
 					} catch (MinecraftException e) {
@@ -82,7 +83,7 @@ public class RegenCommand extends CommandBase {
 					for (int z = 0; z < 16; ++z) {
 						for (int x = 0; x < 16; ++x) {
 							for (int y = 0; y < world.getHeight(); ++y) {
-								world.markBlockForUpdate(x + chunkX * 16, y, z + chunkZ * 16);
+								world.markBlockForUpdate(new BlockPos(x + chunkX * 16, y, z + chunkZ * 16));
 							}
 						}
 					}

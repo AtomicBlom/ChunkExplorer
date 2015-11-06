@@ -1,10 +1,12 @@
 package net.binaryvibrance.chunkexplorer;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -27,7 +29,7 @@ public class ReplaceCommand extends CommandBase {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
 
-			if (!MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile())) {
+			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 			int argumentNumber = 0;
@@ -68,7 +70,8 @@ public class ReplaceCommand extends CommandBase {
 				List<Block> potentialBlocks = new ArrayList<Block>();
 				for(Object blockObject : Block.blockRegistry) {
 					Block b = (Block)blockObject;
-					if (b.getUnlocalizedName().contains(replaceBlock)) {
+					final String unlocalizedName = b.getUnlocalizedName();
+					if (unlocalizedName.contains(replaceBlock)) {
 						potentialBlocks.add(b);
 					}
 				}
@@ -122,14 +125,17 @@ public class ReplaceCommand extends CommandBase {
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					Block b = world.getBlock(x, y, z);
+					final BlockPos pos = new BlockPos(x, y, z);
+					IBlockState blockState = world.getBlockState(pos);
+					Block b = blockState.getBlock();
 
-					if (filter != null && !b.getUnlocalizedName().contains(filter)) {
+					final String unlocalizedName = b.getUnlocalizedName().toLowerCase();
+					if (filter != null && !unlocalizedName.contains(filter)) {
 						continue;
 					}
 
-					world.setBlock(x, y, z, replacement, 0, 2);
-					world.markBlockForUpdate(x, y, z);
+					world.setBlockState(pos, replacement.getDefaultState(), 2);
+					world.markBlockForUpdate(pos);
 					blocksSurveyed++;
 				}
 			}
