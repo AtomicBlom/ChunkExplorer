@@ -3,12 +3,15 @@ package net.binaryvibrance.chunkexplorer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockStaticLiquid;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 public class XRayCommand extends CommandBase {
@@ -27,7 +30,7 @@ public class XRayCommand extends CommandBase {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
 
-			if (!MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile())) {
+			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
 				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
 			}
 
@@ -84,7 +87,9 @@ public class XRayCommand extends CommandBase {
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					Block b = world.getBlock(x, y, z);
+					final BlockPos blockPos = new BlockPos(x, y, z);
+					IBlockState blockState = world.getBlockState(blockPos);
+					Block b = blockState.getBlock();
 
 					String unlocalizedName = b.getUnlocalizedName();
 					if (!unlocalizedName.contains(":")) {
@@ -92,16 +97,17 @@ public class XRayCommand extends CommandBase {
 					}
 
 					if (filter != null && unlocalizedName.contains(filter)) {
-						world.setBlock(x, y, z, Blocks.air, 0, 0);
-						world.markBlockForUpdate(x, y, z);
+						world.setBlockState(blockPos, Blocks.air.getDefaultState(), 0);
+						world.markBlockForUpdate(blockPos);
 						blocksRemoved++;
 						continue;
 					}
 
 					if (b == Blocks.stone || b == Blocks.sand || b == Blocks.grass || b == Blocks.gravel || b == Blocks.dirt) {
 						boolean liquidFound = false;
-						for (int[] neighbour : neighbours) {
-							Block neighbourBlock = world.getBlock(x + neighbour[0], y + neighbour[1], z + neighbour[2]);
+						for (EnumFacing neighbour : EnumFacing.VALUES) {
+							IBlockState neighbourBlockState = world.getBlockState(blockPos.offset(neighbour));
+							Block neighbourBlock = neighbourBlockState.getBlock();
 							if (neighbourBlock instanceof BlockStaticLiquid || neighbourBlock instanceof BlockDynamicLiquid) {
 								liquidFound = true;
 								break;
@@ -109,8 +115,8 @@ public class XRayCommand extends CommandBase {
 						}
 
 						if (!liquidFound && (filter == null)) {
-							world.setBlock(x, y, z, Blocks.air, 0, 0);
-							world.markBlockForUpdate(x, y, z);
+							world.setBlockState(blockPos, Blocks.air.getDefaultState(), 0);
+							world.markBlockForUpdate(blockPos);
 							blocksRemoved++;
 						}
 					}
