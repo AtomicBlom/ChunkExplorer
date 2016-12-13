@@ -101,7 +101,7 @@ public class XRayCommand extends CommandBase {
 					}
 
 					if (filter != null && unlocalizedName.contains(filter)) {
-						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
+						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 2);
 						//world.markBlockForUpdate(blockPos);
 						blocksRemoved++;
 						continue;
@@ -119,7 +119,7 @@ public class XRayCommand extends CommandBase {
 						}
 
 						if (!liquidFound && (filter == null)) {
-							world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
+							world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 2);
 							//world.markBlockForUpdate(blockPos);
 							blocksRemoved++;
 						}
