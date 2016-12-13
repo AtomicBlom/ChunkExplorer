@@ -1,4 +1,4 @@
-package net.binaryvibrance.chunkexplorer;
+package com.github.atomicblom.chunkexplorer;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;

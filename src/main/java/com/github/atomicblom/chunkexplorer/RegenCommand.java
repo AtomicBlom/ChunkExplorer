@@ -1,4 +1,4 @@
-package net.binaryvibrance.chunkexplorer;
+package com.github.atomicblom.chunkexplorer;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
