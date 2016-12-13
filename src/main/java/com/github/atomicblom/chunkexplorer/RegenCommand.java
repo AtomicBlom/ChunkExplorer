@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.IChunkLoader;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraftforge.common.util.EnumHelper;
 
 import java.io.IOException;
 
@@ -71,7 +72,8 @@ public class RegenCommand extends CommandBase {
 			for (int chunkZ = minZ; chunkZ <= maxZ; chunkZ++) {
 				for (int chunkX = minX; chunkX <= maxX; chunkX++) {
 					IChunkLoader currentChunkLoader = provider.chunkLoader;
-					provider.chunkLoader = null;
+
+					/*provider.chunkLoader = null;
 					final Chunk existingChunk = provider.getLoadedChunk(chunkX, chunkZ);
 					if (existingChunk != null)
 					{
@@ -96,7 +98,7 @@ public class RegenCommand extends CommandBase {
 							}
 						}
 					}
-
+					*/
 					chunkProgress++;
 					player.addChatComponentMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 				}
