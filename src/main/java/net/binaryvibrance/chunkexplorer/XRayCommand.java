@@ -9,9 +9,9 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class XRayCommand extends CommandBase {
@@ -26,13 +26,15 @@ public class XRayCommand extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender commandSender, String[] arguments) {
+	public int getRequiredPermissionLevel()
+	{
+		return 3;
+	}
+
+	@Override
+	public void execute(MinecraftServer server, ICommandSender commandSender, String[] arguments) {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
-
-			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
-				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
-			}
 
 			int argumentNumber = 0;
 			Integer radius = null;
@@ -60,19 +62,19 @@ public class XRayCommand extends CommandBase {
 			int maxZ = (player.chunkCoordZ + radius);
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
-			player.addChatComponentMessage(new ChatComponentText(String.format("clearing %d chunks", numberOfChunks)));
+			player.addChatComponentMessage(new TextComponentString(String.format("clearing %d chunks", numberOfChunks)));
 			long blocksRemoved = 0;
 			float chunkProgress = 0;
 			for (int x = minX; x <= maxX; x++) {
 				for (int z = minZ; z <= maxZ; z++) {
 					blocksRemoved += doXRay(player.worldObj, x, z, filter);
 					chunkProgress++;
-					player.addChatComponentMessage(new ChatComponentText(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+					player.addChatComponentMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 
 				}
 			}
 
-			player.addChatComponentMessage(new ChatComponentText(String.format("Removed %d blocks, sending to client", blocksRemoved)));
+			player.addChatComponentMessage(new TextComponentString(String.format("Removed %d blocks, sending to client", blocksRemoved)));
 		}
 	}
 
@@ -84,10 +86,12 @@ public class XRayCommand extends CommandBase {
 		int minZ = chunkZ * 16;
 		int maxZ = chunkZ * 16 + 16;
 
+		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					final BlockPos blockPos = new BlockPos(x, y, z);
+					blockPos.setPos(x, y, z);
 					IBlockState blockState = world.getBlockState(blockPos);
 					Block b = blockState.getBlock();
 
@@ -97,13 +101,13 @@ public class XRayCommand extends CommandBase {
 					}
 
 					if (filter != null && unlocalizedName.contains(filter)) {
-						world.setBlockState(blockPos, Blocks.air.getDefaultState(), 0);
-						world.markBlockForUpdate(blockPos);
+						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
+						//world.markBlockForUpdate(blockPos);
 						blocksRemoved++;
 						continue;
 					}
 
-					if (b == Blocks.stone || b == Blocks.sand || b == Blocks.grass || b == Blocks.gravel || b == Blocks.dirt) {
+					if (b == Blocks.STONE || b == Blocks.SAND || b == Blocks.GRASS || b == Blocks.GRAVEL || b == Blocks.DIRT) {
 						boolean liquidFound = false;
 						for (EnumFacing neighbour : EnumFacing.VALUES) {
 							IBlockState neighbourBlockState = world.getBlockState(blockPos.offset(neighbour));
@@ -115,8 +119,8 @@ public class XRayCommand extends CommandBase {
 						}
 
 						if (!liquidFound && (filter == null)) {
-							world.setBlockState(blockPos, Blocks.air.getDefaultState(), 0);
-							world.markBlockForUpdate(blockPos);
+							world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
+							//world.markBlockForUpdate(blockPos);
 							blocksRemoved++;
 						}
 					}

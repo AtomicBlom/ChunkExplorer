@@ -1,17 +1,16 @@
 package net.binaryvibrance.chunkexplorer;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -28,13 +27,15 @@ public class SurveyCommand extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender commandSender, String[] arguments) {
+	public int getRequiredPermissionLevel()
+	{
+		return 3;
+	}
+
+	@Override
+	public void execute(MinecraftServer server, ICommandSender commandSender, String[] arguments) {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
-
-			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
-				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
-			}
 
 			int argumentNumber = 0;
 			Integer radius = null;
@@ -62,7 +63,7 @@ public class SurveyCommand extends CommandBase {
 			int maxZ = (player.chunkCoordZ + radius);
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
-			player.addChatComponentMessage(new ChatComponentText(String.format("conducting survey over %d chunks", numberOfChunks)));
+			player.addChatComponentMessage(new TextComponentString(String.format("conducting survey over %d chunks", numberOfChunks)));
 			Hashtable<String, List<Block>> locatedBlocks = new Hashtable<String, List<Block>>();
 			long blocksSurveyed = 0;
 			float chunkProgress = 0;
@@ -70,16 +71,16 @@ public class SurveyCommand extends CommandBase {
 				for (int z = minZ; z <= maxZ; z++) {
 					blocksSurveyed += doSurvey(player.worldObj, x, z, locatedBlocks);
 					chunkProgress++;
-					player.addChatComponentMessage(new ChatComponentText(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+					player.addChatComponentMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 				}
 			}
 
 			if (blocksSurveyed == 0) {
-				player.addChatComponentMessage(new ChatComponentText(String.format("No Blocks in chunk?")));
+				player.addChatComponentMessage(new TextComponentString(String.format("No Blocks in chunk?")));
 				return;
 			}
 
-			player.addChatComponentMessage(new ChatComponentText("----------------"));
+			player.addChatComponentMessage(new TextComponentString("----------------"));
 
 			SortedSet<Map.Entry<String, List<Block>>> sortedSet = new TreeSet<Map.Entry<String, List<Block>>>(new Comparator<Map.Entry<String, List<Block>>>() {
 				@Override
@@ -91,14 +92,14 @@ public class SurveyCommand extends CommandBase {
 			});
 			sortedSet.addAll(locatedBlocks.entrySet());
 
-			ChatStyle white = new ChatStyle();
-			white.setColor(EnumChatFormatting.WHITE);
-			ChatStyle blockName = new ChatStyle();
-			blockName.setColor(EnumChatFormatting.BLUE);
-			ChatStyle blockCountStyle = new ChatStyle();
-			blockCountStyle.setColor(EnumChatFormatting.DARK_RED);
-			ChatStyle blockPercentStyle = new ChatStyle();
-			blockPercentStyle.setColor(EnumChatFormatting.DARK_RED);
+			Style white = new Style();
+			white.setColor(TextFormatting.WHITE);
+			Style blockName = new Style();
+			blockName.setColor(TextFormatting.BLUE);
+			Style blockCountStyle = new Style();
+			blockCountStyle.setColor(TextFormatting.DARK_RED);
+			Style blockPercentStyle = new Style();
+			blockPercentStyle.setColor(TextFormatting.DARK_RED);
 
 			for (Map.Entry<String, List<Block>> kvp : sortedSet) {
 				String name = kvp.getKey().substring(5);
@@ -111,19 +112,19 @@ public class SurveyCommand extends CommandBase {
 				}
 
 				int count = kvp.getValue().size();
-				ChatComponentText chat = new ChatComponentText("");
-				ChatComponentText subChatComponent;
-				chat.setChatStyle(white);
-				subChatComponent = new ChatComponentText(name);
-				subChatComponent.setChatStyle(blockName);
+				TextComponentString chat = new TextComponentString("");
+				TextComponentString subChatComponent;
+				chat.setStyle(white);
+				subChatComponent = new TextComponentString(name);
+				subChatComponent.setStyle(blockName);
 				chat.appendSibling(subChatComponent);
 				chat.appendText(" - ");
-				subChatComponent = new ChatComponentText(Integer.toString(count));
-				subChatComponent.setChatStyle(blockCountStyle);
+				subChatComponent = new TextComponentString(Integer.toString(count));
+				subChatComponent.setStyle(blockCountStyle);
 				chat.appendSibling(subChatComponent);
 				chat.appendText(" blocks, ");
-				subChatComponent = new ChatComponentText(String.format("%3.3f", count / (float)blocksSurveyed * 100.0f));
-				subChatComponent.setChatStyle(blockPercentStyle);
+				subChatComponent = new TextComponentString(String.format("%3.3f", count / (float)blocksSurveyed * 100.0f));
+				subChatComponent.setStyle(blockPercentStyle);
 				chat.appendSibling(subChatComponent);
 				chat.appendText("%");
 
@@ -139,16 +140,19 @@ public class SurveyCommand extends CommandBase {
 		int minZ = chunkZ * 16;
 		int maxZ = chunkZ * 16 + 16;
 
+		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					IBlockState blockState = world.getBlockState(new BlockPos(x, y, z));
+					blockPos.setPos(x, y, z);
+					IBlockState blockState = world.getBlockState(blockPos);
 					final Block b = blockState.getBlock();
-					if (b == Blocks.air) continue;
+					if (b == Blocks.AIR) continue;
 					String blockName = b.getUnlocalizedName();
 					List<Block> blocks = locatedBlocks.get(blockName);
 					if (blocks == null) {
-						blocks = new ArrayList<Block>();
+						blocks = new ArrayList<>();
 						locatedBlocks.put(blockName, blocks);
 					}
 					blocks.add(b);

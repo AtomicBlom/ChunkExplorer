@@ -6,8 +6,8 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -25,13 +25,16 @@ public class ReplaceCommand extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender commandSender, String[] arguments) {
+	public int getRequiredPermissionLevel()
+	{
+		return 3;
+	}
+
+	@Override
+	public void execute(MinecraftServer server, ICommandSender commandSender, String[] arguments) {
 		if (commandSender instanceof EntityPlayerMP) {
 			EntityPlayerMP player = (EntityPlayerMP) commandSender;
 
-			if (!MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
-				player.addChatComponentMessage(new ChatComponentText("You need to be operator to use this command."));
-			}
 			int argumentNumber = 0;
 			Integer radius = null;
 			if (arguments.length > argumentNumber) {
@@ -60,7 +63,7 @@ public class ReplaceCommand extends CommandBase {
 			Block replacementBlock;
 
 			if (replaceBlock == null) {
-				player.addChatComponentMessage(new ChatComponentText(String.format("No replacement specified")));
+				player.addChatComponentMessage(new TextComponentString(String.format("No replacement specified")));
 				return;
 			} else {
 				replacementBlock = Block.getBlockFromName(replaceBlock);
@@ -68,7 +71,7 @@ public class ReplaceCommand extends CommandBase {
 
 			if (replacementBlock == null) {
 				List<Block> potentialBlocks = new ArrayList<Block>();
-				for(Object blockObject : Block.blockRegistry) {
+				for(Object blockObject : Block.REGISTRY) {
 					Block b = (Block)blockObject;
 					final String unlocalizedName = b.getUnlocalizedName();
 					if (unlocalizedName.contains(replaceBlock)) {
@@ -76,14 +79,14 @@ public class ReplaceCommand extends CommandBase {
 					}
 				}
 				if (potentialBlocks.size() == 0) {
-					player.addChatComponentMessage(new ChatComponentText(String.format("Could not find type of replacement.")));
+					player.addChatComponentMessage(new TextComponentString(String.format("Could not find type of replacement.")));
 					return;
 				} else if (potentialBlocks.size() == 1) {
 					replacementBlock = potentialBlocks.get(0);
 				} else {
-					player.addChatComponentMessage(new ChatComponentText(String.format("replacement type not specific enough, it could have been one of:")));
+					player.addChatComponentMessage(new TextComponentString(String.format("replacement type not specific enough, it could have been one of:")));
 					for (Block b : potentialBlocks) {
-						player.addChatComponentMessage(new ChatComponentText(b.getUnlocalizedName()));
+						player.addChatComponentMessage(new TextComponentString(b.getUnlocalizedName()));
 					}
 				}
 
@@ -96,22 +99,22 @@ public class ReplaceCommand extends CommandBase {
 			int maxZ = (player.chunkCoordZ + radius);
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
-			player.addChatComponentMessage(new ChatComponentText(String.format("conducting survey over %d chunks", numberOfChunks)));
+			player.addChatComponentMessage(new TextComponentString(String.format("conducting survey over %d chunks", numberOfChunks)));
 			long blocksSurveyed = 0;
 			float chunkProgress = 0;
 			for (int x = minX; x <= maxX; x++) {
 				for (int z = minZ; z <= maxZ; z++) {
 					blocksSurveyed += doSurvey(player.worldObj, x, z, filter, replacementBlock);
 					chunkProgress++;
-					player.addChatComponentMessage(new ChatComponentText(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+					player.addChatComponentMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 				}
 			}
 
 			if (blocksSurveyed == 0) {
-				player.addChatComponentMessage(new ChatComponentText(String.format("No Blocks in chunk?")));
+				player.addChatComponentMessage(new TextComponentString(String.format("No Blocks in chunk?")));
 				return;
 			}
-			player.addChatComponentMessage(new ChatComponentText(String.format("%d blocks replaced", blocksSurveyed)));
+			player.addChatComponentMessage(new TextComponentString(String.format("%d blocks replaced", blocksSurveyed)));
 		}
 	}
 
@@ -122,10 +125,11 @@ public class ReplaceCommand extends CommandBase {
 		int minZ = chunkZ * 16;
 		int maxZ = chunkZ * 16 + 16;
 
+		final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (int x = minX; x < maxX; ++x) {
 			for (int z = minZ; z < maxZ; ++z) {
 				for (int y = 1; y < world.getHeight(); ++y) {
-					final BlockPos pos = new BlockPos(x, y, z);
+					pos.setPos(x, y, z);
 					IBlockState blockState = world.getBlockState(pos);
 					Block b = blockState.getBlock();
 
@@ -134,8 +138,9 @@ public class ReplaceCommand extends CommandBase {
 						continue;
 					}
 
-					world.setBlockState(pos, replacement.getDefaultState(), 2);
-					world.markBlockForUpdate(pos);
+					final IBlockState newState = replacement.getDefaultState();
+					world.setBlockState(pos, newState, 2);
+					//world.notifyBlockUpdate(pos, blockState, newState, 2);
 					blocksSurveyed++;
 				}
 			}
