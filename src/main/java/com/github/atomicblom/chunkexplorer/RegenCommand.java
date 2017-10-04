@@ -17,12 +17,12 @@ import java.io.IOException;
 
 public class RegenCommand extends CommandBase {
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "chunkregen";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender commandSender) {
+	public String getUsage(ICommandSender commandSender) {
 		return "chunkregen [radiusInChunks]";
 	}
 
@@ -58,10 +58,10 @@ public class RegenCommand extends CommandBase {
 			int maxZ = (player.chunkCoordZ + radius);
 
 			int numberOfChunks = (maxX - minX + 1) * (maxZ - minZ + 1);
-			player.addChatComponentMessage(new TextComponentString(String.format("regenerating %d chunks", numberOfChunks)));
+			player.sendMessage(new TextComponentString(String.format("regenerating %d chunks", numberOfChunks)));
 			float chunkProgress = 0;
 
-			World world = player.worldObj;
+			World world = player.world;
 			if (!(world.getChunkProvider() instanceof ChunkProviderServer)) {
 				return;
 			}
@@ -100,10 +100,10 @@ public class RegenCommand extends CommandBase {
 					}
 					*/
 					chunkProgress++;
-					player.addChatComponentMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+					player.sendMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 				}
 			}
-			player.addChatComponentMessage(new TextComponentString("Done."));
+			player.sendMessage(new TextComponentString("Done."));
 		}
 	}
 }
