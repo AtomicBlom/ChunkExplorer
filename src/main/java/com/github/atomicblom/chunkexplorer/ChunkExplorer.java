@@ -12,9 +12,6 @@ public class ChunkExplorer {
 	public static final String MOD_NAME = "Chunk Explorer";
 	public static final String MOD_VERSION = "@MOD_VERSION@";
 
-	@Mod.Instance(ChunkExplorer.MOD_ID)
-	public static ChunkExplorer instance;
-
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
 		event.registerServerCommand(new XRayCommand());

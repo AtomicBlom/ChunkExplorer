@@ -3,16 +3,14 @@
 		"modid": "chunkexplorer",
 		"name": "Chunk Explorer",
 		"description": "Useful utilities for world gen modders",
-		"version": "0.1.1",
+		"version": "${version}",
 		"credits": "Created by AtomicBlom",
-		"mcversion": "1.10.2",
-		"url": "http://www.binaryvibrance.net/",
+		"mcversion": "${mcversion}",
+		"url": "http://github.com/AtomicBlom/ChunkExplorer",
 		"updateUrl": "",
 		"authors": [ "AtomicBlom" ],
 		"parent":"",
 		"screenshots": [],
-		"dependencies": [
-			"mod_MinecraftForge"
-		]
+		"dependencies": []
 	}
 ]
