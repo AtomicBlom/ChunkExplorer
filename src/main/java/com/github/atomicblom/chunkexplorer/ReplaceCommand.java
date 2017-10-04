@@ -5,11 +5,15 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerChunkMap;
+import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import java.util.List;
 
 public class ReplaceCommand extends CommandBase {
@@ -86,8 +90,12 @@ public class ReplaceCommand extends CommandBase {
 						player.sendMessage(new TextComponentString(potentialBlock.getUnlocalizedName()));
 					}
 				}
-
 			}
+
+			if (!(player.world instanceof WorldServer)) {
+				return;
+			}
+			final WorldServer world = (WorldServer)player.world;
 
 			final int minX = player.chunkCoordX - radius;
 			final int maxX = player.chunkCoordX + radius;
@@ -101,7 +109,7 @@ public class ReplaceCommand extends CommandBase {
 			float chunkProgress = 0;
 			for (int x = minX; x <= maxX; x++) {
 				for (int z = minZ; z <= maxZ; z++) {
-					blocksSurveyed += doSurvey(player.world, x, z, filter, replacementBlock);
+					blocksSurveyed += doReplace(player.world, x, z, filter, replacementBlock);
 					chunkProgress++;
 					player.sendMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
 				}
@@ -111,11 +119,23 @@ public class ReplaceCommand extends CommandBase {
 				player.sendMessage(new TextComponentString("No Blocks in chunk?"));
 				return;
 			}
+
+			final PlayerChunkMap playerChunkMap = world.getPlayerChunkMap();
+			for (final EntityPlayer playerEntity : world.playerEntities)
+			{
+				if (playerEntity instanceof EntityPlayerMP)
+				{
+					final EntityPlayerMP mp = (EntityPlayerMP) playerEntity;
+					playerChunkMap.removePlayer(mp);
+					playerChunkMap.addPlayer(mp);
+				}
+			}
+
 			player.sendMessage(new TextComponentString(String.format("%d blocks replaced", blocksSurveyed)));
 		}
 	}
 
-	private long doSurvey(World world, int chunkX, int chunkZ, String filter, Block replacement) {
+	private long doReplace(World world, int chunkX, int chunkZ, String filter, Block replacement) {
 		long blocksSurveyed = 0;
 		final int minX = chunkX * 16;
 		final int maxX = chunkX * 16 + 16;
@@ -130,8 +150,8 @@ public class ReplaceCommand extends CommandBase {
 					final IBlockState blockState = world.getBlockState(pos);
 					final Block block = blockState.getBlock();
 
-					final String unlocalizedName = block.getUnlocalizedName().toLowerCase();
-					if (filter == null || unlocalizedName.contains(filter))
+					final String registryName = block.getRegistryName().toString().toLowerCase();
+					if (filter == null || registryName.contains(filter))
 					{
 						final IBlockState newState = replacement.getDefaultState();
 						world.setBlockState(pos, newState, 2);

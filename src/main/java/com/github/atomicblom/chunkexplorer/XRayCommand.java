@@ -6,13 +6,16 @@ import net.minecraft.block.BlockStaticLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 public class XRayCommand extends CommandBase {
 	@Override
@@ -55,6 +58,11 @@ public class XRayCommand extends CommandBase {
 				radius = 0;
 			}
 
+			if (!(player.world instanceof WorldServer)) {
+				return;
+			}
+			final WorldServer world = (WorldServer)player.world;
+
 			final int minX = player.chunkCoordX - radius;
 			final int maxX = player.chunkCoordX + radius;
 
@@ -70,7 +78,17 @@ public class XRayCommand extends CommandBase {
 					blocksRemoved += doXRay(player.world, x, z, filter);
 					chunkProgress++;
 					player.sendMessage(new TextComponentString(String.format("%3.1f percent complete", chunkProgress / numberOfChunks * 100.0f)));
+				}
+			}
 
+			final PlayerChunkMap playerChunkMap = world.getPlayerChunkMap();
+			for (final EntityPlayer playerEntity : world.playerEntities)
+			{
+				if (playerEntity instanceof EntityPlayerMP)
+				{
+					final EntityPlayerMP mp = (EntityPlayerMP) playerEntity;
+					playerChunkMap.removePlayer(mp);
+					playerChunkMap.addPlayer(mp);
 				}
 			}
 
@@ -95,10 +113,7 @@ public class XRayCommand extends CommandBase {
 					final IBlockState blockState = world.getBlockState(blockPos);
 					final Block block = blockState.getBlock();
 
-					String unlocalizedName = block.getUnlocalizedName();
-					if (!unlocalizedName.contains(":")) {
-						unlocalizedName = "minecraft:" + unlocalizedName;
-					}
+					String unlocalizedName = block.getRegistryName().toString().toLowerCase();
 
 					if (filter == null || !unlocalizedName.contains(filter))
 					{
@@ -119,13 +134,13 @@ public class XRayCommand extends CommandBase {
 
 							if (noLiquidFound && filter == null)
 							{
-								world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 2);
+								world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
 								blocksRemoved++;
 							}
 						}
 					} else
 					{
-						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 2);
+						world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 0);
 						blocksRemoved++;
 					}
 				}
